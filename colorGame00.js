@@ -25,11 +25,12 @@ const Square = ({id, player, newState}) => {
   )
 }
 const Board = () => {
+  const [boardKey, setBoardKey] = React.useState(0);
   const [player, setPlayer] = React.useState(1);
   let status = `Player ${player}`;
   // Set overall game state here
   const [state, setState] = React.useState([]); 
-  // Function to set new game state
+  // Function to update game state
   const newState = (ob) => {
     let nextplayer = (player + 1) % 2;
     setPlayer(nextplayer);
@@ -38,38 +39,37 @@ const Board = () => {
     status = `Player ${nextplayer}`;
     return nextplayer;
   };
-  // Other functions we need
+  // Render Squares
   function renderSquare(i) {
     return <Square id={i} player={player} newState={newState}></Square>;
   }
-  function clearBoard() {
-
+  // Reset Board 
+  function resetBoard () {
+    setBoardKey((boardKey + 1) % 2);
+    setPlayer(1);
   }
   return (
-    <>
-      <div className="game-board">
-        <div className="grid-row">
-          {renderSquare(0)}
-          {renderSquare(1)}
-          {renderSquare(2)}
-        </div>
-        <div className="grid-row">
-          {renderSquare(3)}
-          {renderSquare(4)}
-          {renderSquare(5)}
-        </div>
-        <div className="grid-row">
-          {renderSquare(6)}
-          {renderSquare(7)}
-          {renderSquare(8)}
-        </div>
-        <div id="info">
-          <h1>{status}</h1>
-        </div>
+    <div key={boardKey} className="game-board">
+      <div className="grid-row">
+        {renderSquare(0)}
+        {renderSquare(1)}
+        {renderSquare(2)}
       </div>
-      <button onClick={clearBoard}>
-      Clear Board</button>
-    </>
+      <div className="grid-row">
+        {renderSquare(3)}
+        {renderSquare(4)}
+        {renderSquare(5)}
+      </div>
+      <div className="grid-row">
+        {renderSquare(6)}
+        {renderSquare(7)}
+        {renderSquare(8)}
+      </div>
+      <div id="info">
+        <h1>{status}</h1>
+        <button onClick={resetBoard}>Clear Board</button>
+      </div>
+    </div>
   );
 };
 
