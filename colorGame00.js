@@ -2,9 +2,7 @@ const Square = ({id, player, newState}) => {
   const [color, setColor] = React.useState("green");
   const [status, setStatus] = React.useState(null); // am I an X or an O? 
   const xo = ["o", "x"];
-  
-  const palet = ["red","blue","green"];
-  const getRandomColor = () => palet[Math.floor(Math.random()*3)];
+  const palet = ["red","green"];
   React.useEffect(() => {
     console.log(`Render ${id}`);
     return () => console.log(`unmounting Square ${id}`);
@@ -14,7 +12,7 @@ const Square = ({id, player, newState}) => {
     <button 
       onClick={e => {
         if(status === null) {
-          let col = getRandomColor();
+          let col = palet[player];
           setColor(col);
           let nextplayer = newState({id:id, color:col});
           setStatus(nextplayer);
@@ -44,17 +42,34 @@ const Board = () => {
   function renderSquare(i) {
     return <Square id={i} player={player} newState={newState}></Square>;
   }
+  function clearBoard() {
+
+  }
   return (
-    <div className="game-board">
-      <div className="grid-row">
-        {renderSquare(0)}
-        {renderSquare(1)}
-        {renderSquare(2)}
+    <>
+      <div className="game-board">
+        <div className="grid-row">
+          {renderSquare(0)}
+          {renderSquare(1)}
+          {renderSquare(2)}
+        </div>
+        <div className="grid-row">
+          {renderSquare(3)}
+          {renderSquare(4)}
+          {renderSquare(5)}
+        </div>
+        <div className="grid-row">
+          {renderSquare(6)}
+          {renderSquare(7)}
+          {renderSquare(8)}
+        </div>
+        <div id="info">
+          <h1>{status}</h1>
+        </div>
       </div>
-      <div id="info">
-        <h1>{status}</h1>
-      </div>
-    </div>
+      <button onClick={clearBoard}>
+      Clear Board</button>
+    </>
   );
 };
 
