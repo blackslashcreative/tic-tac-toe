@@ -1,45 +1,77 @@
-const Square = ({ takeTurn, id }) => {
-  const mark = ["O", "X", "+"];
-  // id is the square's number
-  // filled tells us if square has been filled
-  // tik tells us symbol in square (same as player)
-  // We call takeTurn to tell Parent we have filled the square
-  const [filled, setFilled] = React.useState(false);
-  const [tik, setTik] = React.useState(2);
+const Square = ({id, player, newState}) => {
+  const [color, setColor] = React.useState("green");
+  const [status, setStatus] = React.useState(null); // am I an X or an O? 
+  const xo = ["o", "x"];
+  const palet = ["red","green"];
+  React.useEffect(() => {
+    console.log(`Render ${id}`);
+    return () => console.log(`unmounting Square ${id}`);
+  });
 
   return (
-    <button
-      onClick={() => {
-        setTik(takeTurn(id));
-        setFilled(true);
-        console.log(`Square: ${id} filled by player : ${tik}`);
+    <button 
+      onClick={e => {
+        if(status === null) {
+          let col = palet[player];
+          setColor(col);
+          let nextplayer = newState(id);
+          setStatus(nextplayer);
+          e.target.style.background = col;
+        }
       }}
     >
-      <h1>{mark[tik]}</h1>
+      <h1>{xo[status]}</h1>
     </button>
-  );
-};
-
+  )
+}
 const Board = () => {
-  // 1st player is X ie 1
-  // State keeps track of next player and gameState
+  const [boardKey, setBoardKey] = React.useState(0);
   const [player, setPlayer] = React.useState(1);
-  const [gameState, setGameState] = React.useState([]);
-  // check for winner (see superset.js)
-  let status = `Winner is ${checkForWinner(gameState)}`;
-  console.log(`We hava a winner ${status}`);
-
-  const takeTurn = (id) => {
-    setGameState([...gameState, { id: id, player: player }]);
-    setPlayer((player + 1) % 2); // get next player
-    return player;
+  // Set overall game state here
+  const [state, setState] = React.useState(Array(9).fill(null)); 
+  let status = `Player ${player}`;  
+  let winner = checkWinner(state);
+  if(winner != null) status = `Player ${winner} wins!`;
+  // Function to update game state
+  const newState = idOfSquare => {
+    let thePlayer = player;
+    state[idOfSquare] = player; // gives that square to current player
+    setState(state); // state is array of 0 or 1 or null
+    let nextplayer = (player + 1) % 2;
+    setPlayer(nextplayer);
+    return thePlayer; // return the current player
   };
+  // Render Squares
   function renderSquare(i) {
-    // use properties to pass callback function takeTurn to Child
-    return <Square takeTurn={takeTurn} id={i}></Square>;
+    return <Square id={i} player={player} newState={newState}></Square>;
+  }
+  // Check Winner 
+  function checkWinner(state) {
+    // state is an array of 0 and 1 and null
+    const win = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+    for (let i = 0; i < win.length; i++) {
+      const [a, b, c] = win[i];
+      if (state[a] == state[b] && state[a] == state[c] && state[a]) 
+        return state[a]; // return the winner (0 or 1)
+    }
+    return null;
+  }
+  // Reset Board 
+  function resetBoard () {
+    setBoardKey((boardKey + 1) % 2);
+    setPlayer(1);
   }
   return (
-    <div className="game-board">
+    <div key={boardKey} className="game-board">
       <div className="grid-row">
         {renderSquare(0)}
         {renderSquare(1)}
@@ -57,19 +89,12 @@ const Board = () => {
       </div>
       <div id="info">
         <h1>{status}</h1>
+        <button onClick={resetBoard}>Clear Board</button>
       </div>
-    </div>
-  );
-};
-
-const Game = () => {
-  return (
-    <div className="game">
-      <Board></Board>
     </div>
   );
 };
 
 // ========================================
 
-ReactDOM.render(<Game />, document.getElementById("root"));
+ReactDOM.render(<Board />, document.getElementById("root"));
