@@ -1,7 +1,6 @@
 // Check Winner 
-function checkWinner(state) {
-  console.log(state);
-  // state is an array of 0 and 1 and null
+function checkWinner(gameState) {
+  // gameState is an array of 0 and 1 and null
   const win = [
     [0, 1, 2],
     [3, 4, 5],
@@ -14,10 +13,8 @@ function checkWinner(state) {
   ];
   for (let i = 0; i < win.length; i++) {
     const [a, b, c] = win[i];
-    console.log([a,b,c]);
-    console.log(state[a], state[b], state[c]);
-    if (state[a] == state[b] && state[a] == state[c] && state[a] != null) 
-      return state[a]; // return the winner (0 or 1)
+    if (gameState[a] == gameState[b] && gameState[a] == gameState[c] && gameState[a] != null) 
+      return gameState[a] == 1 ? "X" : "O"; // return the winner (0 or 1)
   }
   return null;
 }
@@ -53,11 +50,15 @@ const Square = ({id, player, newState, winner}) => {
 // React Component: Board
 const Board = () => {
   const [boardKey, setBoardKey] = React.useState(0);
+  // 1st player is X ie 1
+  // State keeps track of current player and gameState
   const [player, setPlayer] = React.useState(1);
   // Set overall game state here
-  const [state, setState] = React.useState(Array(9).fill(null)); 
-  let status = `Player ${player}`;  
-  let winner = checkWinner(state);
+  const [gameState, setGameState] = React.useState(Array(9).fill(null));
+  // Use conditional logic to set a variable to either 'Player O' or  'Player X'
+  const currentPlayer = player == 1 ? "Player X" : "Player O"; 
+  let status = `Next turn: ${currentPlayer}`;  
+  let winner = checkWinner(gameState);
   if(winner != null) status = `Player ${winner} wins!`;
 
   /*React.useEffect(() => {
@@ -65,11 +66,11 @@ const Board = () => {
     return () => console.log(`unmounting board`);
   });*/
 
-  // Function to update game state
+  // Function to update gameState
   const newState = idOfSquare => {
     let thePlayer = player;
-    state[idOfSquare] = player; // gives that square to current player
-    setState(state); // state is array of 0 or 1 or null
+    gameState[idOfSquare] = player; // gives that square to current player
+    setGameState(gameState); // gameState is array of 0 or 1 or null
     let nextplayer = (player + 1) % 2;
     setPlayer(nextplayer);
     return thePlayer; // return the current player who just took the turn
@@ -80,7 +81,7 @@ const Board = () => {
   }
   // Reset Board 
   function resetBoard () {
-    setState(Array(9).fill(null));
+    setGameState(Array(9).fill(null));
     setBoardKey((boardKey + 1) % 2);
     setPlayer(1);
   }
