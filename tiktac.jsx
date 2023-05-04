@@ -14,14 +14,16 @@ function checkWinner(state) {
   ];
   for (let i = 0; i < win.length; i++) {
     const [a, b, c] = win[i];
-    if (state[a] == state[b] && state[a] == state[c] && state[a]) 
+    console.log([a,b,c]);
+    console.log(state[a], state[b], state[c]);
+    if (state[a] == state[b] && state[a] == state[c] && state[a] != null) 
       return state[a]; // return the winner (0 or 1)
   }
   return null;
 }
 
 // React Component: Square
-const Square = ({id, player, newState}) => {
+const Square = ({id, player, newState, winner}) => {
   const [color, setColor] = React.useState("green");
   const [status, setStatus] = React.useState(null); // am I an X or an O? 
   const xo = ["o", "x"];
@@ -34,7 +36,7 @@ const Square = ({id, player, newState}) => {
   return (
     <button 
       onClick={e => {
-        if(status === null) {
+        if(status === null && winner === null) {
           let col = palet[player];
           setColor(col);
           let whoplayed = newState(id);
@@ -74,7 +76,7 @@ const Board = () => {
   };
   // Render Squares
   function renderSquare(i) {
-    return <Square id={i} player={player} newState={newState}></Square>;
+    return <Square id={i} player={player} newState={newState} winner={winner}></Square>;
   }
   // Reset Board 
   function resetBoard () {
