@@ -1,12 +1,35 @@
+// Check Winner 
+function checkWinner(state) {
+  console.log(state);
+  // state is an array of 0 and 1 and null
+  const win = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
+  for (let i = 0; i < win.length; i++) {
+    const [a, b, c] = win[i];
+    if (state[a] == state[b] && state[a] == state[c] && state[a]) 
+      return state[a]; // return the winner (0 or 1)
+  }
+  return null;
+}
+
+// React Component: Square
 const Square = ({id, player, newState}) => {
   const [color, setColor] = React.useState("green");
   const [status, setStatus] = React.useState(null); // am I an X or an O? 
   const xo = ["o", "x"];
   const palet = ["red","green"];
-  React.useEffect(() => {
+  /*React.useEffect(() => {
     console.log(`Render ${id}`);
     return () => console.log(`unmounting Square ${id}`);
-  });
+  });*/
 
   return (
     <button 
@@ -14,8 +37,8 @@ const Square = ({id, player, newState}) => {
         if(status === null) {
           let col = palet[player];
           setColor(col);
-          let nextplayer = newState(id);
-          setStatus(nextplayer);
+          let whoplayed = newState(id);
+          setStatus(whoplayed);
           e.target.style.background = col;
         }
       }}
@@ -24,6 +47,8 @@ const Square = ({id, player, newState}) => {
     </button>
   )
 }
+
+// React Component: Board
 const Board = () => {
   const [boardKey, setBoardKey] = React.useState(0);
   const [player, setPlayer] = React.useState(1);
@@ -32,6 +57,12 @@ const Board = () => {
   let status = `Player ${player}`;  
   let winner = checkWinner(state);
   if(winner != null) status = `Player ${winner} wins!`;
+
+  /*React.useEffect(() => {
+    console.log(`board rendered`);
+    return () => console.log(`unmounting board`);
+  });*/
+
   // Function to update game state
   const newState = idOfSquare => {
     let thePlayer = player;
@@ -39,34 +70,15 @@ const Board = () => {
     setState(state); // state is array of 0 or 1 or null
     let nextplayer = (player + 1) % 2;
     setPlayer(nextplayer);
-    return thePlayer; // return the current player
+    return thePlayer; // return the current player who just took the turn
   };
   // Render Squares
   function renderSquare(i) {
     return <Square id={i} player={player} newState={newState}></Square>;
   }
-  // Check Winner 
-  function checkWinner(state) {
-    // state is an array of 0 and 1 and null
-    const win = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6]
-    ];
-    for (let i = 0; i < win.length; i++) {
-      const [a, b, c] = win[i];
-      if (state[a] == state[b] && state[a] == state[c] && state[a]) 
-        return state[a]; // return the winner (0 or 1)
-    }
-    return null;
-  }
   // Reset Board 
   function resetBoard () {
+    setState(Array(9).fill(null));
     setBoardKey((boardKey + 1) % 2);
     setPlayer(1);
   }
@@ -96,5 +108,4 @@ const Board = () => {
 };
 
 // ========================================
-
 ReactDOM.render(<Board />, document.getElementById("root"));
